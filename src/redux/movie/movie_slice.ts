@@ -67,10 +67,8 @@ export const bookMovie = createAsyncThunk(
     const updatedMovies = await updateMovie(movieId, {
       isBooked: true,
     });
-    const movies = await getAllMovies();
-    const booked = getListBooked(movies);
     dispatch(setLoading(false));
-    return {updatedMovies, booked};
+    return updatedMovies;
   },
 );
 
@@ -114,7 +112,16 @@ const movieSlice = createSlice({
         }
       })
       .addCase(bookMovie.fulfilled, (state, action) => {
-        state.booked = action.payload.booked;
+        const updatedMovie = action.payload;
+        if (updatedMovie !== null) {
+          state.movies = state.movies.map(movie =>
+            movie.id === updatedMovie.id ? updatedMovie : movie,
+          );
+
+          if (!state.favorites.some(movie => movie.id === updatedMovie.id)) {
+            state.favorites.push(updatedMovie);
+          }
+        }
       });
   },
 });

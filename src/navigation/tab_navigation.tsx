@@ -2,7 +2,12 @@ import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import HomeScreen from '@app/presentation/home/home_screen';
 import FavoriteScreen from '@app/presentation/favorite/favorite_screen';
-import {BOOKED_SCREEN, FAVORITE_SCREEN, HOME_SCREEN, RootStackParamList} from './main_navigation';
+import {
+  BOOKED_SCREEN,
+  FAVORITE_SCREEN,
+  HOME_SCREEN,
+  RootStackParamList,
+} from './main_navigation';
 import BookedScreen from '@app/presentation/booked/booked_screen';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {ParamListBase, RouteProp} from '@react-navigation/native';
@@ -39,11 +44,22 @@ const TabNavigation = () => {
         tabBarIcon: ({focused, color, size}) =>
           renderIcon(focused, color, size, route),
         tabBarActiveTintColor: colors.primary,
-        headerShown: false,
       })}>
-      <Tab.Screen name={HOME_SCREEN} component={HomeScreen} options={{title: 'Home'}} />
-      <Tab.Screen name={FAVORITE_SCREEN} component={FavoriteScreen} options={{title: 'Favorite'}} />
-      <Tab.Screen name={BOOKED_SCREEN} component={BookedScreen} options={{title: 'Booked'}} />
+      <Tab.Screen
+        name={HOME_SCREEN}
+        component={HomeScreen}
+        options={{title: 'Home'}}
+      />
+      <Tab.Screen
+        name={FAVORITE_SCREEN}
+        component={FavoriteScreen}
+        options={{title: 'Favorite'}}
+      />
+      <Tab.Screen
+        name={BOOKED_SCREEN}
+        component={BookedScreen}
+        options={{title: 'Booked'}}
+      />
     </Tab.Navigator>
   );
 };

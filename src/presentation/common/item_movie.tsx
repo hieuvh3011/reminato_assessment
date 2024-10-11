@@ -1,5 +1,12 @@
-import React, {useState} from 'react';
-import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
+import React, {useRef, useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Pressable,
+} from 'react-native';
 import Movie from '@app/entities/movie';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import colors from '@app/theme/colors';
@@ -24,17 +31,26 @@ const ItemMovie = React.memo(({movie}: ItemMovieProps) => {
   const dispatch = useAppDispatch();
 
   const [isLiked, setIsLiked] = useState<boolean>(movie.isLiked);
+  const likeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleLikeToggle = () => {
-    setIsLiked(!isLiked);
-    // delay the logic update in realm database
-    setTimeout(() => {
-      if (!isLiked) {
+    const newLikedStatus = !isLiked;
+    setIsLiked(newLikedStatus);
+
+    // remove existing timeout
+    if (likeTimeoutRef.current) {
+      clearTimeout(likeTimeoutRef.current);
+    }
+
+    // debounce the dispatch with 300ms
+    likeTimeoutRef.current = setTimeout(() => {
+      if (newLikedStatus) {
         dispatch(likeMovie(movie.id));
       } else {
         dispatch(unlikeMovie(movie.id));
       }
-    }, 0);
+      likeTimeoutRef.current = null;
+    }, 300);
   };
 
   const onPressBook = () => {
@@ -44,17 +60,9 @@ const ItemMovie = React.memo(({movie}: ItemMovieProps) => {
 
   const renderBookIcon = () => {
     if (movie.isBooked) {
-      return (
-        <View style={styles.button}>
-          <Icon name="check" size={30} color={colors.status.success} />
-        </View>
-      );
+      return <Icon name="check" size={30} color={colors.status.success} />;
     }
-    return (
-      <TouchableOpacity style={styles.button} onPress={onPressBook}>
-        <Icon name="book" size={30} color={colors.button.booked} />
-      </TouchableOpacity>
-    );
+    return <Icon name="book" size={30} color={colors.button.booked} />;
   };
 
   const renderLikeIcon = () => {
@@ -67,7 +75,7 @@ const ItemMovie = React.memo(({movie}: ItemMovieProps) => {
   };
 
   return (
-    <View style={styles.container}>
+    <Pressable style={styles.container} onPress={onPressBook}>
       <Image source={{uri: movie.thumbnail}} style={styles.image} />
       <View style={styles.info}>
         <Text style={styles.title} numberOfLines={2}>
@@ -78,12 +86,15 @@ const ItemMovie = React.memo(({movie}: ItemMovieProps) => {
         </Text>
       </View>
       <View style={styles.action}>
-        <TouchableOpacity style={styles.button} onPress={handleLikeToggle}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleLikeToggle}
+          hitSlop={10}>
           {renderLikeIcon()}
         </TouchableOpacity>
-        {renderBookIcon()}
+        <View style={styles.button}>{renderBookIcon()}</View>
       </View>
-    </View>
+    </Pressable>
   );
 });
 

@@ -8,10 +8,7 @@
 import MainNavigation from '@app/navigation/main_navigation';
 import LoadingWrapper from '@app/presentation/common/loading_wrapper';
 import store from '@app/redux/store';
-import {
-  closeRealm,
-  getRealm,
-} from '@app/services/movie_service';
+import {closeRealm, getRealm} from '@app/services/movie_service';
 import React, {useEffect, useState} from 'react';
 import {
   AppState,

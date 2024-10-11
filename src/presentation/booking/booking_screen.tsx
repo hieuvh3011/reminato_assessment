@@ -1,10 +1,17 @@
 import {useAppDispatch, useAppSelector} from '@app/redux/store';
 import React from 'react';
-import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
-import Header from '@app/presentation/common/header';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  SafeAreaView,
+} from 'react-native';
 import colors from '@app/theme/colors';
 import {useNavigation} from '@react-navigation/native';
 import {bookMovie} from '@app/redux/movie/movie_slice';
+import HeaderComponent from '@app/presentation/common/header';
 
 const BookingScreen = () => {
   const movie = useAppSelector(state => state.movie.selectedMovie);
@@ -13,13 +20,23 @@ const BookingScreen = () => {
   const dispatch = useAppDispatch();
 
   const onPressBookNow = () => {
+    if (movie?.isBooked) {
+      return;
+    }
     dispatch(bookMovie(movie?.id ?? -1));
     navigation.goBack();
   };
 
+  const getString = () => {
+    if (movie?.isBooked) {
+      return 'Booked';
+    }
+    return 'Book Now';
+  };
+
   return (
-    <View style={styles.container}>
-      <Header title={'Booking'} />
+    <SafeAreaView style={styles.container}>
+      <HeaderComponent title={'Booking'} />
       <View style={styles.content}>
         <Image source={{uri: movie?.thumbnail}} style={styles.poster} />
         <View style={styles.info}>
@@ -27,15 +44,15 @@ const BookingScreen = () => {
           <Text style={styles.description}>{movie?.description}</Text>
           <View style={styles.buttonContainer}>
             <TouchableOpacity
-              style={styles.button}
-              activeOpacity={0.5}
+              style={movie?.isBooked ? styles.disabledButton : styles.button}
+              activeOpacity={movie?.isBooked ? 1 : 0.5}
               onPress={onPressBookNow}>
-              <Text style={styles.buttonText}>Book Now</Text>
+              <Text style={styles.buttonText}>{getString()}</Text>
             </TouchableOpacity>
           </View>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -77,6 +94,14 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingVertical: 16,
     backgroundColor: colors.primary,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  disabledButton: {
+    width: '100%',
+    paddingVertical: 16,
+    backgroundColor: colors.disabled,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
