@@ -18,6 +18,7 @@ const colors = {
   },
   shadow: '#000',
   itemMovieBackground: '#f8f9fa',
+  disabled: '#9ca3af',
 };
 
 export default colors;

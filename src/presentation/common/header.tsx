@@ -1,14 +1,20 @@
 import colors from '@app/theme/colors';
 import {useNavigation} from '@react-navigation/native';
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, SafeAreaView} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  SafeAreaView,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface HeaderProps {
   title: string;
 }
 
-const Header = ({title}: HeaderProps) => {
+const HeaderComponent = React.memo(({title}: HeaderProps) => {
   const navigation = useNavigation();
 
   const onPressBack = () => {
@@ -24,7 +30,7 @@ const Header = ({title}: HeaderProps) => {
       <View style={styles.empty} />
     </SafeAreaView>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -46,4 +52,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Header;
+export default HeaderComponent;

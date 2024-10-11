@@ -22,13 +22,17 @@ export type RootStackParamList = {
 const MainNavigation = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName={HOME_SCREEN}
-        screenOptions={{
-          headerShown: false,
-        }}>
-        <Stack.Screen name={TAB_NAVIGATION} component={TabNavigation} />
-        <Stack.Screen name={BOOKING_SCREEN} component={BookingScreen} />
+      <Stack.Navigator initialRouteName={HOME_SCREEN}>
+        <Stack.Screen
+          name={TAB_NAVIGATION}
+          component={TabNavigation}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={BOOKING_SCREEN}
+          component={BookingScreen}
+          options={{headerShown: false}}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
