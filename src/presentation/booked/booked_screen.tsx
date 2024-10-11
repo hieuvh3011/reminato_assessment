@@ -2,21 +2,11 @@ import React from 'react';
 import {View, StyleSheet, FlatList, Text} from 'react-native';
 import ItemMovie from '@app/presentation/common/item_movie';
 import colors from '@app/theme/colors';
-import {likeMovie, unlikeMovie} from '@app/redux/movie/movie_slice';
-import {useAppDispatch, useAppSelector} from '@app/redux/store';
+import {useAppSelector} from '@app/redux/store';
 import Movie from '@app/entities/movie';
 
 const BookedScreen = () => {
-  const dispatch = useAppDispatch();
   const movies = useAppSelector(state => state.movie.booked);
-
-  const onPressLike = (movie: Movie) => {
-    if (movie.isLiked) {
-      dispatch(unlikeMovie(movie.id));
-    } else {
-      dispatch(likeMovie(movie.id));
-    }
-  };
 
   const renderSeparator = () => {
     return <View style={styles.separator} />;
@@ -31,14 +21,7 @@ const BookedScreen = () => {
   };
 
   const renderItem = ({item}: {item: Movie}) => {
-    return (
-      <ItemMovie
-        movie={item}
-        onPressLike={() => {
-          onPressLike(item);
-        }}
-      />
-    );
+    return <ItemMovie movie={item} />;
   };
 
   const renderFlatList = () => {

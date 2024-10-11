@@ -41,9 +41,9 @@ const TabNavigation = () => {
         tabBarActiveTintColor: colors.primary,
         headerShown: false,
       })}>
-      <Tab.Screen name={HOME_SCREEN} component={HomeScreen} />
-      <Tab.Screen name={FAVORITE_SCREEN} component={FavoriteScreen} />
-      <Tab.Screen name={BOOKED_SCREEN} component={BookedScreen} />
+      <Tab.Screen name={HOME_SCREEN} component={HomeScreen} options={{title: 'Home'}} />
+      <Tab.Screen name={FAVORITE_SCREEN} component={FavoriteScreen} options={{title: 'Favorite'}} />
+      <Tab.Screen name={BOOKED_SCREEN} component={BookedScreen} options={{title: 'Booked'}} />
     </Tab.Navigator>
   );
 };

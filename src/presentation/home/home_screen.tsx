@@ -2,11 +2,7 @@ import React, {useEffect} from 'react';
 import {View, StyleSheet, FlatList, Text} from 'react-native';
 import ItemMovie from '@app/presentation/common/item_movie';
 import colors from '@app/theme/colors';
-import {
-  fetchMovies,
-  likeMovie,
-  unlikeMovie,
-} from '@app/redux/movie/movie_slice';
+import {fetchMovies} from '@app/redux/movie/movie_slice';
 import {useAppDispatch, useAppSelector} from '@app/redux/store';
 import Movie from '@app/entities/movie';
 
@@ -17,14 +13,6 @@ const HomeScreen = () => {
   useEffect(() => {
     dispatch(fetchMovies());
   }, [dispatch]);
-
-  const onPressLike = (movie: Movie) => {
-    if (movie.isLiked) {
-      dispatch(unlikeMovie(movie.id));
-    } else {
-      dispatch(likeMovie(movie.id));
-    }
-  };
 
   const renderSeparator = () => {
     return <View style={styles.separator} />;
@@ -39,14 +27,7 @@ const HomeScreen = () => {
   };
 
   const renderItem = ({item}: {item: Movie}) => {
-    return (
-      <ItemMovie
-        movie={item}
-        onPressLike={() => {
-          onPressLike(item);
-        }}
-      />
-    );
+    return <ItemMovie movie={item} />;
   };
 
   const renderFlatList = () => {

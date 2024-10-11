@@ -5,6 +5,7 @@ import {setLoading} from '@app/redux/app/app_slice';
 import Movie from '@app/entities/movie';
 import {
   getAllMovies,
+  initializeMockData,
   updateMovie,
 } from '@app/services/movie_service';
 
@@ -34,6 +35,7 @@ export const fetchMovies = createAsyncThunk(
   'movies/fetchMovies',
   async (_, {dispatch}) => {
     dispatch(setLoading(true));
+    await initializeMockData();
     const movies = await getAllMovies();
     const favorites = getListFavorite(movies);
     const booked = getListBooked(movies);
@@ -45,22 +47,16 @@ export const fetchMovies = createAsyncThunk(
 export const likeMovie = createAsyncThunk(
   'movies/likeMovie',
   async (movieId: number) => {
-    const likedMovie = initialState.movies.find(item => item.id === movieId);
-    if (likedMovie) {
-      likedMovie.isLiked = true;
-    }
-    return {updateMovie: likedMovie};
+    const updatedMovie = await updateMovie(movieId, {isLiked: true});
+    return updatedMovie;
   },
 );
 
 export const unlikeMovie = createAsyncThunk(
   'movies/unlikeMovie',
   async (movieId: number) => {
-    const likedMovie = initialState.movies.find(item => item.id === movieId);
-    if (likedMovie) {
-      likedMovie.isLiked = false;
-    }
-    return {updateMovie: likedMovie};
+    const updatedMovie = await updateMovie(movieId, {isLiked: false});
+    return updatedMovie;
   },
 );
 
@@ -72,10 +68,9 @@ export const bookMovie = createAsyncThunk(
       isBooked: true,
     });
     const movies = await getAllMovies();
-    const favorites = getListFavorite(movies);
     const booked = getListBooked(movies);
     dispatch(setLoading(false));
-    return {updatedMovies, favorites, booked};
+    return {updatedMovies, booked};
   },
 );
 
@@ -95,14 +90,30 @@ const movieSlice = createSlice({
         state.booked = action.payload.booked;
       })
       .addCase(likeMovie.fulfilled, (state, action) => {
-        Object.assign(state.favorites, action.payload.updateMovie);
+        const updatedMovie = action.payload;
+        if (updatedMovie !== null) {
+          state.movies = state.movies.map(movie =>
+            movie.id === updatedMovie.id ? updatedMovie : movie,
+          );
+
+          if (!state.favorites.some(movie => movie.id === updatedMovie.id)) {
+            state.favorites.push(updatedMovie);
+          }
+        }
       })
       .addCase(unlikeMovie.fulfilled, (state, action) => {
-        Object.assign(state.favorites, action.payload.updateMovie);
+        const updatedMovie = action.payload;
+        if (updatedMovie !== null) {
+          state.movies = state.movies.map(movie =>
+            movie.id === updatedMovie.id ? updatedMovie : movie,
+          );
+
+          state.favorites = state.favorites.filter(
+            movie => movie.id !== updatedMovie.id,
+          );
+        }
       })
       .addCase(bookMovie.fulfilled, (state, action) => {
-        state.movies = action.payload.updatedMovies;
-        state.favorites = action.payload.favorites;
         state.booked = action.payload.booked;
       });
   },
