@@ -5,7 +5,6 @@ import mockData from '../../assets/mock_data.json';
 
 let realmInstance: Realm | null = null;
 
-
 export const getRealm = async (): Promise<Realm> => {
   if (!realmInstance || realmInstance.isClosed) {
     realmInstance = await Realm.open({
@@ -75,21 +74,31 @@ export const updateMovieLike = async (movieId: number, isLiked: boolean) => {
 export const updateMovie = async (
   movieId: number,
   updateData: Partial<Movie>,
-) => {
+): Promise<Movie | null> => {
   const realm = await getRealm();
+  let updatedMovie = null;
+
   realm.write(() => {
-    let movie = realm.objectForPrimaryKey<Movie>(MOVIE_SCHEMA, movieId);
+    const movie = realm.objectForPrimaryKey<Movie>(MOVIE_SCHEMA, movieId);
     if (movie) {
       Object.keys(updateData).forEach(key => {
         const field = key as keyof Movie;
         (movie[field] as any) = updateData[field];
       });
+      // Tạo một bản sao của movie đã được cập nhật để trả về sau khi thoát khỏi realm.write
+      updatedMovie = {
+        id: movie.id,
+        title: movie.title,
+        description: movie.description,
+        thumbnail: movie.thumbnail,
+        isLiked: movie.isLiked,
+        isBooked: movie.isBooked,
+      };
     } else {
       console.warn(`Movie with id ${movieId} not found.`);
     }
   });
-
-  return getAllMovies();
+  return updatedMovie;
 };
 
 export const deleteMovie = async (movieId: number) => {

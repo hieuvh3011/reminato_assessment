@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import Movie from '@app/entities/movie';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -9,16 +9,33 @@ import {
   RootStackParamList,
 } from '@app/navigation/main_navigation';
 import {useAppDispatch} from '@app/redux/store';
-import {selectMovie} from '@app/redux/movie/movie_slice';
+import {
+  likeMovie,
+  selectMovie,
+  unlikeMovie,
+} from '@app/redux/movie/movie_slice';
 
 interface ItemMovieProps {
   movie: Movie;
-  onPressLike: () => void;
 }
 
-const ItemMovie = ({movie, onPressLike}: ItemMovieProps) => {
+const ItemMovie = React.memo(({movie}: ItemMovieProps) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const dispatch = useAppDispatch();
+
+  const [isLiked, setIsLiked] = useState<boolean>(movie.isLiked);
+
+  const handleLikeToggle = () => {
+    setIsLiked(!isLiked);
+    // delay the logic update in realm database
+    setTimeout(() => {
+      if (!isLiked) {
+        dispatch(likeMovie(movie.id));
+      } else {
+        dispatch(unlikeMovie(movie.id));
+      }
+    }, 0);
+  };
 
   const onPressBook = () => {
     dispatch(selectMovie(movie));
@@ -41,11 +58,11 @@ const ItemMovie = ({movie, onPressLike}: ItemMovieProps) => {
   };
 
   const renderLikeIcon = () => {
-    if (movie.isLiked) {
-      return <Icon name="heart" size={30} color={colors.button.favorite} />;
+    if (isLiked) {
+      return <Icon name={'heart'} size={30} color={colors.button.favorite} />;
     }
     return (
-      <Icon name="heart-outline" size={30} color={colors.button.favorite} />
+      <Icon name={'heart-outline'} size={30} color={colors.button.favorite} />
     );
   };
 
@@ -53,20 +70,22 @@ const ItemMovie = ({movie, onPressLike}: ItemMovieProps) => {
     <View style={styles.container}>
       <Image source={{uri: movie.thumbnail}} style={styles.image} />
       <View style={styles.info}>
-        <Text style={styles.title}>{movie.title}</Text>
+        <Text style={styles.title} numberOfLines={2}>
+          {movie.title}
+        </Text>
         <Text style={styles.description} numberOfLines={2}>
           {movie.description}
         </Text>
       </View>
       <View style={styles.action}>
-        <TouchableOpacity style={styles.button} onPress={onPressLike}>
+        <TouchableOpacity style={styles.button} onPress={handleLikeToggle}>
           {renderLikeIcon()}
         </TouchableOpacity>
         {renderBookIcon()}
       </View>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -85,10 +104,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: 'bold',
+    color: colors.textPrimary,
   },
   description: {
     fontSize: 14,
     marginTop: 4,
+    color: colors.textSecondary,
   },
   info: {
     flex: 1,
