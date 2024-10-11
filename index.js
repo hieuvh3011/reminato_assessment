@@ -1,6 +1,6 @@
-/**
- * @format
- */
+if (__DEV__) {
+  require('./ReactoronConfig');
+}
 
 import {AppRegistry} from 'react-native';
 import App from './App';
